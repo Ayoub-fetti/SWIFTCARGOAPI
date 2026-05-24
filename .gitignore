@@ -1,0 +1,33 @@
+# Dependencies
+/bin/
+/obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Rr]elease/
+[Dd]ebug/
+netcoreapp*/
+build/
+artifacts/
+
+# Rider
+.idea/
+*.sln.iml
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.sln.opts
+
+# Mac
+.DS_Store
+
+# App settings
+appsettings.Development.json
