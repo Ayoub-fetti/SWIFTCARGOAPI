@@ -25,11 +25,11 @@ namespace SWIFTCARGOAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserDto request)
+        public async Task<IActionResult> Register(RegisterDto request)
         {
-            if (await _context.Users.AnyAsync(u => u.Username == request.Username))
+            if (await _context.Users.AnyAsync(u => u.Username == request.Username || u.Email == request.Email))
             {
-                return BadRequest("Username already exists.");
+                return BadRequest("Username or Email already exists.");
             }
 
             string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
@@ -37,6 +37,7 @@ namespace SWIFTCARGOAPI.Controllers
             var user = new User
             {
                 Username = request.Username,
+                Email = request.Email,
                 PasswordHash = passwordHash,
                 Role = "User"
             };
@@ -50,10 +51,10 @@ namespace SWIFTCARGOAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserDto request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.UsernameOrEmail || u.Email == request.UsernameOrEmail);
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
             {
-                return Unauthorized("Invalid username or password.");
+                return Unauthorized("Invalid credentials.");
             }
 
             var token = CreateToken(user);

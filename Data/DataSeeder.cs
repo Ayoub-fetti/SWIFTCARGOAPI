@@ -23,11 +23,13 @@ namespace SWIFTCARGOAPI.Data
                 }
 
                 var adminUsername = configuration["AdminUser:Username"] ?? "admin";
+                var adminEmail = configuration["AdminUser:Email"] ?? "admin@admin.com"; 
                 var adminPassword = configuration["AdminUser:Password"] ?? "Admin@123";
 
                 var adminUser = new User
                 {
                     Username = adminUsername,
+                    Email = adminEmail, // Ajoutez cette ligne
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
                     Role = "Admin"
                 };

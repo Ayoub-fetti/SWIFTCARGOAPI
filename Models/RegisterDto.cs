@@ -2,11 +2,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SWIFTCARGOAPI.Models
 {
-    public class UserDto
+    public class RegisterDto
     {
         [Required]
-        //peut fournir soit son nom d'utilisateur soit son e-mail
-        public required string UsernameOrEmail { get; set; }
+        public required string Username { get; set; }
+
+        [Required]
+        [EmailAddress]
+        public required string Email { get; set; }
 
         [Required]
         public required string Password { get; set; }
