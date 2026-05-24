@@ -24,7 +24,16 @@ namespace SWIFTCARGOAPI.Controllers
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Registers a new user in the system.
+        /// </summary>
+        /// <param name="request">The user's registration details (username, email, password).</param>
+        /// <returns>A confirmation message if registration is successful.</returns>
+        /// <response code="200">User registered successfully.</response>
+        /// <response code="400">If the username or email already exists.</response>
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register(RegisterDto request)
         {
             if (await _context.Users.AnyAsync(u => u.Username == request.Username || u.Email == request.Email))
@@ -48,7 +57,16 @@ namespace SWIFTCARGOAPI.Controllers
             return Ok("User registered successfully.");
         }
 
+        /// <summary>
+        /// Authenticates a user and returns a JWT token.
+        /// </summary>
+        /// <param name="request">The user's login credentials (username/email and password).</param>
+        /// <returns>A JWT token for the authenticated user.</returns>
+        /// <response code="200">Returns the JWT token.</response>
+        /// <response code="401">If the credentials are invalid.</response>
         [HttpPost("login")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login(UserDto request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.UsernameOrEmail || u.Email == request.UsernameOrEmail);

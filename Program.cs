@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SWIFTCARGOAPI.Data;
 using QuestPDF.Infrastructure;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +16,48 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// documentation swagger
+builder.Services.AddSwaggerGen(options =>
+{
+    // Configuration de base
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "SwiftCargo API",
+        Description = "An ASP.NET Core Web API for managing international shipments."
+    });
+
+    // Configuration pour l'authentification JWT dans Swagger UI
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+
+    // Intégrer les commentaires XML
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 // Configure DbContext with MySQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -49,7 +93,7 @@ builder.Services.AddAuthentication(options =>
 // add services 
 builder.Services.AddScoped<SWIFTCARGOAPI.Services.IShipmentService, SWIFTCARGOAPI.Services.ShipmentService>();
 
-QuestPDF.Settings.License = LicenseType.Community; 
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 
