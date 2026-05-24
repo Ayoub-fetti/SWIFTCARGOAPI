@@ -11,5 +11,6 @@ namespace SWIFTCARGOAPI.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<Shipment> Shipments { get; set; }
     }
 }

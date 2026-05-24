@@ -42,6 +42,10 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// add services 
+builder.Services.AddScoped<SWIFTCARGOAPI.Services.IShipmentService, SWIFTCARGOAPI.Services.ShipmentService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
