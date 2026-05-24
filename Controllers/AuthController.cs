@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SWIFTCARGOAPI.Data;
 using SWIFTCARGOAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace SWIFTCARGOAPI.Controllers
 {
@@ -82,6 +84,23 @@ namespace SWIFTCARGOAPI.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+
+        
+        [HttpPut("user/{id}/role")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateUserRole(int id, [FromBody] RoleUpdateDto roleUpdate)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            user.Role = roleUpdate.Role;
+            await _context.SaveChangesAsync();
+
+            return Ok($"User role updated to {roleUpdate.Role}.");
         }
     }
 }

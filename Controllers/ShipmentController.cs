@@ -4,6 +4,8 @@ using SWIFTCARGOAPI.Models;
 using SWIFTCARGOAPI.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using QuestPDF.Fluent;
+using SWIFTCARGOAPI.Documents;
 
 namespace SWIFTCARGOAPI.Controllers
 {
@@ -82,6 +84,36 @@ namespace SWIFTCARGOAPI.Controllers
                 return NotFound();
             }
             return Ok("Status updated successfully.");
+        }
+        
+
+        [HttpGet("report/pdf")]
+        public async Task<IActionResult> GetShipmentReport([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+        {
+            var allShipments = await _shipmentService.GetAllShipmentsAsync();
+
+            // Filter by date range if provided
+            var filteredShipments = allShipments
+                .Where(s => (!startDate.HasValue || s.EstimatedDelivery.Date >= startDate.Value.Date))
+                .Where(s => (!endDate.HasValue || s.EstimatedDelivery.Date <= endDate.Value.Date))
+                .ToList();
+
+            if (!filteredShipments.Any())
+            {
+                return NotFound("No shipments found for the selected date range.");
+            }
+
+            var reportTitle = $"Shipment Report ({startDate:yyyy-MM-dd} - {endDate:yyyy-MM-dd})";
+            if (!startDate.HasValue && !endDate.HasValue)
+            {
+                reportTitle = "Full Shipment Report";
+            }
+
+            var document = new ShipmentReport(filteredShipments, reportTitle);
+            var pdfBytes = document.GeneratePdf();
+
+            var fileName = $"ShipmentReport_{DateTime.Now:yyyyMMddHHmm}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
         }
     }
 }

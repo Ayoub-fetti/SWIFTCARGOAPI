@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SWIFTCARGOAPI.Data;
+using QuestPDF.Infrastructure;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -45,8 +49,12 @@ builder.Services.AddAuthentication(options =>
 // add services 
 builder.Services.AddScoped<SWIFTCARGOAPI.Services.IShipmentService, SWIFTCARGOAPI.Services.ShipmentService>();
 
+QuestPDF.Settings.License = LicenseType.Community; 
 
 var app = builder.Build();
+
+await SWIFTCARGOAPI.Data.DataSeeder.SeedAdminUser(app.Services);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
